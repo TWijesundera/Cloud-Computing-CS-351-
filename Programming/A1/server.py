@@ -18,18 +18,18 @@
 import socket
 
 
-def processFile (infile):
+def processFile ():
     num_chars = 0
     num_words = 0
 
-    with open('./smallSample.txt', 'r') as in_file:
-        for line_num, line in enumerate(in_file):
+    with open("./countfile", 'r') as file:
+        for line_num, line in enumerate(file):
             words = line.split()
             num_words += len(words)
             num_chars += sum(len(word) for word in words)
-    in_file.close()
+    file.close()
 
-    return [line_num+1, num_words, num_chars]
+    return [line_num+1, num_words, num_chars+len(words)]
     
 if __name__ == "__main__":
     # Create a socket object
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Get local machine name
     host = socket.gethostname()
-    port = 9999
+    port = 34590
 
     # Bind to port
     server_sock.bind((host, port))
@@ -61,10 +61,11 @@ if __name__ == "__main__":
 
             print("Got a connection from {}".format(str(addr)))
 
-            counts = processFile(infile)
+            counts = processFile()
             print(counts)
 
-            msg = "Thank you for connecting" + "\r\n"
+            msg = "The hostname is: {} \n Number of line: {} \
+            \n Number of words: {} \n Number of characters: {} \r\n".format(host, counts[0], counts[1], counts[2])
             client_sock.send(msg.encode('ascii'))
             client_sock.close()
 
