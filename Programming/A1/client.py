@@ -1,7 +1,7 @@
 """
-    Client program to run on EC2 server
-    CS 351
     Thisara Wijesundera
+    CS 351
+    Assignment 1: client.py
 
     Description:
         This program is meant to recieve number or characters,
@@ -25,39 +25,40 @@ def sanitizeIP(ip_address):
 def sanitizePort(port_number):
 	return len(port_number) > 3
 
-if len(sys.argv) != 4:
-	input("Make sure you're running the program correctly \
-	python client.py <server_ip_address> <port_number> <path_to_file>")
-	quit()
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+if __name__  == "__main__":
+    try:
+        if len(sys.argv) != 4:
+            raise Exception("\nMake sure you are running the program correctly " \
+            "python client.py <server_ip> <port_number> <file_path>\n")
 
-# Get local machine name
-if sanitizeIP(sys.argv[1]):
-	host = sys.argv[1]
-else:
-	input("\nPlease make sure the IP address is correct\n")
-	quit()
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-if sanitizePort(sys.argv[2]):
-	port = int(sys.argv[2])
-else:
-	input("\nPlease choose a higher port number\n")
-	quit()
+    # Get local machine name
+        if sanitizeIP(sys.argv[1]):
+            host = sys.argv[1]
+        else:
+            raise Exception("\nPlease make sure the IP address is correct\n")
+        
+        if sanitizePort(sys.argv[2]):
+            port = int(sys.argv[2])
+        else:
+            raise Exception("\nPlease choose a higher port number\n")
 
-# Connection to hostname on port
-s.connect((host, port))
+        s.connect((host, port))
+    except Exception as e:
+        print(e)
 
-file_to_send = open(sys.argv[3], 'rb')
-transmit = file_to_send.read(1024)
+    file_to_send = open(sys.argv[3], 'rb')
+    transmit = file_to_send.read(4096)
 
-while transmit:
-    s.sendall(transmit)
-    transmit = file_to_send.read(1024)
+    while transmit:
+        s.sendall(transmit)
+        transmit = file_to_send.read(4096)
 
-s.shutdown(socket.SHUT_WR)
+    s.shutdown(socket.SHUT_WR)
 
-#Recieve no more than 1024 bytes
-msg = s.recv(1024)
-s.close()
-print(msg.decode('ascii'))
+    # Recieve no more than 4096 bytes
+    msg = s.recv(1024)
+    s.close()
+    print(msg.decode('ascii'))

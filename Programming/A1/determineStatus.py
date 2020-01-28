@@ -18,5 +18,4 @@ try:
 	input("Press Enter to Exit")
 except ValueError:
 	print("\nPlease enter an integer value\n")
-	input("Press Enter to Exit")
 	quit()

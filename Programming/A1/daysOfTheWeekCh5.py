@@ -1,6 +1,9 @@
 """
 	Days of the week Chapter 4
 	CS 351
+
+	Description:
+		Working with different types of collection
 """
 
 days = {
@@ -14,5 +17,6 @@ days = {
 }
 
 print(days)
-print(tuple(days.items()))
 print(list(days.keys()))
+# Generator function to get only the values for all keys in days
+print(tuple(days.get(x) for x in days.keys()))
