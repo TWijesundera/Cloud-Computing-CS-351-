@@ -1,8 +1,6 @@
-"""
-	Determine Status program Chapter 6
-	CS 351
-	Thisara Wijesundera
-"""
+# Thisara Wijesundera
+# CS 351
+# Determine Status program Chapter 6
 
 try:
 	user_input = input("Enter an age as a number \n")
@@ -15,7 +13,7 @@ try:
 	else:
 		print("\nSenior")
 	
-	input("Press Enter to Exit")
+	input("\nPress Enter to Exit")
 except ValueError:
 	print("\nPlease enter an integer value\n")
 	quit()

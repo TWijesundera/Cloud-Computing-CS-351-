@@ -1,7 +1,8 @@
-"""
-	Days of the week Chapter 4
-	CS 351
+# Thisara Wijesundera
+# Days of the week Chapter 4
+# CS 351
 
+"""
 	Description:
 		Working with different types of collection
 """

@@ -1,8 +1,6 @@
-"""
-	Tutorial points Python simple server code
-	CS 351
-	Thisara Wijesundera
-"""
+# CS 351
+# Thisara Wijesundera
+# Tutorial points Python simple server code
 
 import socket
 

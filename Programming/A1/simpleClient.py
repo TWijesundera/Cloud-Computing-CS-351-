@@ -1,8 +1,6 @@
-"""
-	Client side code from tutorial point
-	CS 351
-	Thisara Wijesundera
-"""
+# CS 351
+# Thisara Wijesundera
+# Client side code from tutorial point
 
 import socket
 
