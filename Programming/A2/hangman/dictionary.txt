@@ -1,0 +1,9 @@
+processor 379
+cache 174
+laptop 399
+memory 299
+dell 300
+lenovo 279
+mini 179
+keyboard 39
+motherboard 280
