@@ -6,10 +6,7 @@
 from shape import Shape
 
 class Rectangle(Shape):
-    """Rectangle class
-        Args:
-        Returns:
-    """
+    """Rectangle class"""
 
     def __init__(self, sides):
         Shape.__init__(self, sides)

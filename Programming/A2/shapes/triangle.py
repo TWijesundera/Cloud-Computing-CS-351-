@@ -7,10 +7,7 @@ import math
 from shape import Shape
 
 class Triangle(Shape):
-    """Triangle class
-        Args:
-        Returns:
-    """
+    """Triangle class"""
 
     def __init__(self, sides):
         Shape.__init__(self, sides)

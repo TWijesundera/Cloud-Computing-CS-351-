@@ -7,12 +7,7 @@ from typing import List
 
 class Shape:
     """Shape class
-
         Parent class for Rectangle and Triangle
-
-        Args:
-
-        Returns:
     """
     def __init__(self, sides: List[int]):
         self.sides = sides
