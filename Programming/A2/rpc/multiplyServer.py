@@ -21,7 +21,7 @@ def mutiply_nums(num_1: int, num_2: int) -> int:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Please provide all required arguements\n")
+        print("USAGE: python3 <port_num>\n")
         sys.exit()
     else:
         try:

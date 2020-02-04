@@ -36,51 +36,60 @@ def read_file(input_file: str) -> List[tuple]:
 
     try:
         with open(input_file) as file:
+            """
+                For every line remove the operation and convert
+                    the numbers into and integer list
+                Append it to list for returning
+            """
             for line in file:
                 splited = line.split()
                 output.append((splited[0], [int(x) for x in splited[1:]]))
         return output
     except FileNotFoundError as err:
-        print("ERROR: {}\n".format(err))
+        print(f"ERROR: {err}\n")
+        sys.exit()
+    
+    except IndexError as err:
+        print(f"Operations file is empty\nERROR: {err}")
         sys.exit()
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 6:
-        print("Please provide all arguments\n")
+        msg = ('USAGE: python3 <add_hostname/ip> <add_port>'
+        ' <multiply_hostname/ip> <multiply_port> <operations_file>\n')
+        print(msg)
         sys.exit()
     else:
-        ADD_HOST = sys.argv[1]
-        ADD_PORT = sys.argv[2]
-
-        MUL_HOST = sys.argv[3]
-        MUL_PORT = sys.argv[4]
-        operations = read_file(sys.argv[5])
-
         try:
-            ADD_CONN = xmlrpc.client.ServerProxy('http://{}:{}'.format(ADD_HOST, ADD_PORT))
-            MUL_CONN = xmlrpc.client.ServerProxy('http://{}:{}'.format(MUL_HOST, MUL_PORT))
+            ADD_HOST = sys.argv[1]
+            ADD_PORT = sys.argv[2]
+
+            MUL_HOST = sys.argv[3]
+            MUL_PORT = sys.argv[4]
+            operations = read_file(sys.argv[5])
+
+            ADD_CONN = xmlrpc.client.ServerProxy(f'http://{ADD_HOST}:{ADD_PORT}')
+            MUL_CONN = xmlrpc.client.ServerProxy(f'http://{MUL_HOST}:{MUL_PORT}')
 
             for opr in operations:
                 num_1 = opr[1][0]
                 num_2 = opr[1][1]
 
                 if opr[0] == 'A':
-                    print("{} + {} = {}"
-                          .format(num_1, num_2, ADD_CONN.add(num_1, num_2)))
+                    print(f"{num_1} + {num_2} = {ADD_CONN.add(num_1, num_2)}")
                 elif opr[0] == 'M':
-                    print("{} * {} = {}"
-                          .format(num_1, num_2, MUL_CONN.mul(num_1, num_2)))
+                    print(f"{num_1} * {num_2} = {MUL_CONN.mul(num_1, num_2)}")
                 else:
                     print("Unsupported operand!\n")
 
         except ConnectionRefusedError as err:
             msg = ("The connection was refused."
                    "Check outbound rules of sec group and port number")
-            print("{}\nERROR: {}\n".format(msg, err))
+            print(f"{msg}\nERROR: {err}\n")
 
         except OSError as err:
-            print("Hostname or port invalid\nERROR: {}\n".format(err))
+            print(f"Hostname or port invalid\nERROR: {err}\n")
 
         except KeyboardInterrupt:
             print("\n")
