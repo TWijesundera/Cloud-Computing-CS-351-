@@ -49,3 +49,7 @@ def clear_guessed_letters():
     """Clears the list of guessed letters"""
     global __guessed_letters
     __guessed_letters.clear()
+
+def check_if_guessed(current_guess: str) -> bool:
+    """Checks if the user guessed the random word correctly"""
+    return current_guess.count('-') == 0

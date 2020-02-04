@@ -7,9 +7,9 @@ from backend import used_letters, clear_guessed_letters, reset_guesses
 from dictionary import remove_from_choices
 
 def print_game(word: str) -> str:
-    """Prints the letter to guess based on what the user has already guessed"""
+    """Creates the current guess string"""
     letters = used_letters()
-    return "".join(['-' if char not in letters else '{}'.format(char) for char in word])
+    return "".join(['-' if char not in letters else f'{char}' for char in word])
 
 def print_guessed_letters() -> str:
     """Prints the letters the user has already guessed"""

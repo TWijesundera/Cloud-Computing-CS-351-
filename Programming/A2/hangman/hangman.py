@@ -5,7 +5,7 @@
 
 import sys
 
-from dictionary import parse_file, OUTPUT, choose_word, remove_from_choices
+from dictionary import parse_file, hangman_words, choose_word, remove_from_choices
 from printing import *
 from backend import *
 
@@ -23,6 +23,21 @@ if __name__ == "__main__":
                " You have 6 tries to guess the word.\n")
         print(msg)
 
+        """
+            Algorithm:
+                Print the game information to STDOUT
+                User guesses letter
+                Program checks if letter is alphabetical, is not in
+                    the list of guessed words
+                Then checks if it's in the random word the program chose
+                Checks if the word was guessed
+                Finally checks if the user has enough guesses left
+                Prompt the user to guess another word
+
+            Condition:
+                Loop as long as the user score does not go
+                above 1000 and below 0
+        """
         while get_score() < 1000 and get_score() >= 0:
             current_guess = print_game(guess_word)
             print("Current Guess: {} ".format(current_guess))
@@ -34,25 +49,25 @@ if __name__ == "__main__":
             if len(letter) == 1 and letter.isalpha():
                 if letter not in used_letters():
                     if letter in guess_word:
-                        print("\nYes, there is a {}\n".format(letter))
+                        print(f"\nYes, there is a {letter}\n")
                         add_to_guessed(letter)
                     else:
-                        print("\nSorry, no {}".format(letter))
+                        print(f"\nSorry, no {letter}\n")
                         subtract_guess()
                         add_to_guessed(letter)
                 else:
                     print("You've already guessed that letter!\n")
 
                 if get_guesses() != 0:
-                    if current_guess.count('-') <= 1:
-                        add_score(OUTPUT[guess_word])
-                        print("Congratulations! You won this round. Your current score is {}\n"
-                              .format(get_score()))
+                    if check_if_guessed(print_game(guess_word)):
+                        add_score(hangman_words[guess_word])
+                        print("Congratulations, the word was '{}'! Your current score is {}\n"
+                              .format(guess_word, get_score()))
 
                         game_cleanup(guess_word)
-                        guess_word = choose_word()
+                        guess_word = choose_word() # Pick a new word
                 else:
-                    subtract_score(OUTPUT[guess_word])
+                    subtract_score(hangman_words[guess_word])
                     print("Sorry, the word I picked was '{}'. Your current score is {}\n"
                           .format(guess_word, get_score()))
 
@@ -61,12 +76,20 @@ if __name__ == "__main__":
             else:
                 print("The chracter(s) you entered are invalid. Please try again.\n")
 
+        # Win or Lose condition
         WIN_MSG = "Your score is over 1000. You win!\n"
         LOSE_MSG = "Sorry, your score is negative. You lose\n"
         print(WIN_MSG) if get_score() > 1000 else print(LOSE_MSG)
 
     except ValueError as err:
         print(err)
+
+    except FileNotFoundError as err:
+        print(err)
+
+    except IndexError as err:
+        print("There are no words in the file provided.\nERROR: {}"
+              .format(err))
+
     except KeyboardInterrupt:
         print('\n')
-        sys.exit()
