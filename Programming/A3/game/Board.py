@@ -1,5 +1,9 @@
 """This class handles all interations with the
     tic tac toe board
+
+    Author: Thisara Wijesundera
+    CS 351
+    Assignment 3
 """
 from typing import List
 
@@ -38,23 +42,25 @@ class Board:
                 return False
         return True
 
-    def find_winner(self):
+    def find_winner(self) -> str:
         """Checks if there is 3 in a row on the horizontal
            vertical and diagonal
 
             Args:
 
             Returns:
+                The winners symbol
 
             Algorithm:
                 If all return false then check if the board is filled
                 If the board is filled then it is a draw
         
         """
-        print("vertical {}".format(self.check_vertical()))
+        print("vertical: {}".format(self.check_vertical()))
         print("horizontal: {}".format(self.check_horizontal()))
+        print("diagonal: {}".format(self.check_diagonal()))
 
-    def check_horizontal(self) -> bool:
+    def check_horizontal(self) -> tuple:
         """Checks each row for 3 in a row
 
             Returns:
@@ -62,19 +68,19 @@ class Board:
                 False: If 3 in a row is not found on the board
         """
         for row in self._board.values():
-            for num in range(len(row)-2):
-                if row[num] != '-':
-                    print(f"first: {row[num]} second: {row[num+1]} third: {row[num+2]}")
-                    if row[num] == row[num+1] == row[num+2]:
-                        return True
-            return False
+            for index in range(len(row)-2):
+                if row[index] != '-':
+                    # print(f"first: {row[index]} second: {row[index+1]} third: {row[index+2]}")
+                    if row[index] == row[index+1] == row[index+2]:
+                        return (True, row[index])
+            return (False, None)
         
-    def check_vertical(self) -> bool:
+    def check_vertical(self) -> tuple:
         """Checks for 3 in a row vertically
 
             Retuns:
-                True: If 3 in a row in found
-                False: If 3 in a row is not found
+                True, symbol: If 3 in a row in found
+                False, none: If 3 in a row is not found
             
             Algorithm:
                 Loop the dictionary keys to the length of dict - 2
@@ -85,20 +91,28 @@ class Board:
         """
         ref_board = self._board
         for key in range(len(ref_board)-2):
-            for num in range(len(ref_board[key])):
-                if ref_board[key][num] != '-':
-                    if ref_board[key][num] == ref_board[key+1][num] \
-                        == ref_board[key+2][num]:
-                        return True
-        return False
+            for index in range(len(ref_board[key])):
+                if ref_board[key][index] != '-':
+                    if ref_board[key][index] == ref_board[key+1][index] \
+                       == ref_board[key+2][index]:
+                        return (True, ref_board[key][index])
+        return (False, None)
 
-    def check_diagonal(self):
+    def check_diagonal(self) -> tuple:
         """Checks for 3 in a row diagonally
 
             Returns:
                 True: If 3 in a row is found
                 False: If 3 in a row is not found
         """
+        ref_board = self._board
+        for key in range(len(ref_board)-2):
+            for index in range(len(ref_board[key])-2):
+                if ref_board[key][index] != '-':
+                    if ref_board[key][index] == ref_board[key+1][index+1] \
+                        == ref_board[key+2][index+2]:
+                        return (True, ref_board[key][index])
+        return (False, None)
 
     def reset_board(self):
         pass
@@ -126,8 +140,8 @@ if __name__ == "__main__":
     board.update_board(1,8,'O')
     board.update_board(1,9,'O')
     board.update_board(7,7,'O')
-    board.update_board(8,7,'O')
-    board.update_board(9,7,'O')
+    board.update_board(8,8,'O')
+    board.update_board(9,9,'O')
     print(board.__str__())
     board.find_winner()
     #print(board.board_full())
