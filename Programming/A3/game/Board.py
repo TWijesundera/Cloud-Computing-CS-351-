@@ -38,7 +38,7 @@ class Board:
     def board_full(self) -> bool:
         """Check if the board is full"""
         for x in self._board.values():
-            if '-' in x:    
+             if '-' in x:    
                 return False
         return True
 
@@ -135,6 +135,9 @@ class Board:
         return "\n".join(printed_board)
 
 if __name__ == "__main__":
+    print("Please run using Server.py\n")
+    sys.exit()
+    """
     board = Board()
     board.update_board(1,7,'O')
     board.update_board(1,8,'O')
@@ -145,7 +148,6 @@ if __name__ == "__main__":
     print(board.__str__())
     board.find_winner()
     #print(board.board_full())
-    """
     board.update_board(2, 3, 'X')
     print("\n")
     board.__str__()

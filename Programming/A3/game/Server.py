@@ -40,50 +40,47 @@ class Server:
     def chat_server(self):
         while True:
             server_socket = self.server_socket
-            try:
-                # get the list sockets which are ready to be read through select
-                # 4th arg, time_out  = 0 : poll and never block
-                ready_to_read,ready_to_write,in_error = select.select([x[0] for x in self.players_sockets.values()],[],[],0)
-            
-                for sock in ready_to_read:
-                    # print("ready list: {} ".format(ready_to_read))
-                    # print("ready sock {} ".format(sock))
-                    # a new connection request recieved
-                    if sock == server_socket: 
-                        sockfd, addr = server_socket.accept()
-                        self.players_sockets[addr] = (sockfd, self.assign_player())
-                        # print(f"\nsocket list: {self.players_sockets}\n")
-                        print ("Client (%s, %s) connected" % addr)
-                        
-                        self.broadcast(sockfd, "[%s:%s] entered the chat room\n" % addr)
+            # get the list sockets which are ready to be read through select
+            # 4th arg, time_out  = 0 : poll and never block
+            ready_to_read,ready_to_write,in_error = select.select([x[0] for x in self.players_sockets.values()],[],[],0)
+        
+            for sock in ready_to_read:
+                # print("ready list: {} ".format(ready_to_read))
+                # print("ready sock {} ".format(sock))
+                # a new connection request recieved
+                if sock == server_socket: 
+                    sockfd, addr = server_socket.accept()
+                    self.players_sockets[addr] = (sockfd, self.assign_player())
+                    # print(f"\nsocket list: {self.players_sockets}\n")
+                    print ("Client (%s, %s) connected" % addr)
                     
-                    # a message from a client, not a new connection
-                    else:
-                        # process data recieved from client, 
-                        try:
-                            # receiving data from the socket.
-                            data = sock.recv(RECV_BUFFER).decode('UTF-8')
-                            # print(f"after data recv else statement: {data}")
-                            if data:
-                                # there is something in the socket
-                                # print(f"recieved data: {data}")
-                                self.broadcast(sock, f"\r[{str(sock.getpeername())}] {data}")  
-                            else:
-                                # remove the socket that's broken    
-                                if sock in self.players_sockets:
-                                    # print("Sock in else: {}".format(sock))
-                                    self.players_sockets.pop(sock.getpeername())
+                    self.broadcast(sockfd, "[%s:%s] entered the chat room\n" % addr)
+                
+                # a message from a client, not a new connection
+                else:
+                    # process data recieved from client, 
+                    try:
+                        # receiving data from the socket.
+                        data = sock.recv(RECV_BUFFER).decode('UTF-8')
+                        # print(f"after data recv else statement: {data}")
+                        if data:
+                            # there is something in the socket
+                            # print(f"recieved data: {data}")
+                            self.broadcast(sock, f"\r[{str(sock.getpeername())}] {data}")  
+                        else:
+                            # remove the socket that's broken    
+                            if sock in self.players_sockets:
+                                # print("Sock in else: {}".format(sock))
+                                self.players_sockets.pop(sock.getpeername())
 
-                                # at this stage, no data means probably the connection has been broken
-                                self.broadcast(sock, "Client (%s, %s) is offline\n" % addr) 
+                            # at this stage, no data means probably the connection has been broken
+                            self.broadcast(sock, "Client (%s, %s) is offline\n" % addr) 
 
-                        # exception 
-                        except Exception as e:
-                            # print(f"execption offline : {e}\n")
-                            self.broadcast(sock, "Client (%s, %s) is offline\n" % addr)
-                            continue
-            except KeyboardInterrupt:
-                return
+                    # exception 
+                    except Exception as e:
+                        print(f"ERROR peer offline: {e}\n")
+                        self.broadcast(sock, "Client (%s, %s) is offline\n" % addr)
+                        continue
     
     # broadcast chat messages to all connected clients
     def broadcast (self, sock, message):
@@ -108,6 +105,8 @@ class Server:
 
     def assign_player(self):
         """ Assigns the player to X or O
+
+            Modifies the class variable Server.symbol
         """
         symbol = Server.symbol
 
