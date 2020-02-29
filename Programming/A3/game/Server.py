@@ -1,6 +1,7 @@
 import sys
 import socket
 import select
+import re
 
 from Board import Board
 from typing import Dict, List
@@ -18,7 +19,7 @@ class Server:
     
     symbol = 'X'
 
-    def __init__(self, HOST, PORT):
+    def __init__(self, HOST: str, PORT: int):
         """Initilize server with some variables
 
             Variables:
@@ -26,8 +27,10 @@ class Server:
                 board (Board): Initalize the Tic Tac Toe board object
                 server_socket (Socket): Keeps track of the servers socket object
         """
+
         self.game_board = Board()
         self.players_sockets = {}
+
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -41,16 +44,12 @@ class Server:
             print(f"ERROR {msg}")
             sys.exit()
 
-    def broadcast_board(self):
-        pass
-
     def check_for_players(self):
+        """ Checks if there are enough 'X' and 'O' players to play the game"""
         count = Counter(x[1] for x in self.players_sockets.values())
         return count.get('X', 0) >= 1 and count.get('O', 0) >= 1
 
-    def check_if_ready(self, message):
-        """Check if all the players are ready to begin the game
-        """
+    """def check_if_ready(self, message: str):
         for socket in self.players_sockets:
             # send the message to all peers
             if socket != self.server_socket.getsockname():
@@ -63,8 +62,25 @@ class Server:
                     # broken socket, remove it
                     if socket in self.players_sockets:
                         self.players_sockets.pop(socket)
-                    print("\nERROR: {e}\n")
+                    print(f"\nERROR: {e}\n")"""
 
+    def sanitize_input(self, user_data: str, symbol: str) -> bool:
+        """Checks and makes sure the input is correct and can be sent to update the board
+
+            Args:
+                user_data (str): Message the user sent
+
+            Returns:
+                True: Successfully able to update the board
+                False: Unable to update board
+        """
+        user_in = re.findall(r"[^\W_]+", user_data)
+        try:
+            self.game_board.update_board(int(user_in[0]), int(user_in[1]), symbol)
+            return True
+        except IndexError:
+            return False
+        
 
     def chat_server(self):
         """Starts the server loop
@@ -80,30 +96,44 @@ class Server:
                 Else
                     Text data gets sent to everyone
         """
+        server_socket = self.server_socket
+        game_started = False
+        game_board = self.game_board
+        turn = 'X'
+
         while True:
-            server_socket = self.server_socket
-            game_started = False
-            game_board = self.game_board
-            turn = 'X'
             # get the list sockets which are ready to be read through select
             # 4th arg, time_out  = 0 : poll and never block
             ready_to_read,ready_to_write,in_error = select.select([x[0] for x in self.players_sockets.values()],[],[],0)
-        
+
             for read_sock in ready_to_read:
                 # print("ready list: {} ".format(ready_to_read))
                 # print("ready sock {} ".format(sock))
                 # a new connection request recieved
                 if read_sock == server_socket: 
+                    print(f"Read sock: {read_sock}")
                     new_conn, addr = server_socket.accept()
                     self.players_sockets[addr] = (new_conn, self.assign_player())
                     # print(f"\nsocket list: {self.players_sockets}\n")
-                    print ("Client (%s, %s) connected" % addr)
+                    print (f"Client {addr} connected\n")
+
                     self.broadcast(f"{addr} entered the chat room\n", sock=new_conn)
-                    print(self.check_for_players())
-                    if self.check_for_players() and not game_started:
-                        self.broadcast(f"Let's begin tic tac toe\n")
-                        self.broadcast(f"{self.game_board.__str__()}\n")
+
+                    if self.check_for_players():
+                        print("tic tac toe")
+                        self.broadcast(f"[server]: Let's begin tic tac toe\n")
+                        print("broadcast board")
+                        self.broadcast(f"[server]:\n{self.game_board.__str__()}\n")
                         game_started = True
+                        if game_started:
+                            print(f"turn: {turn}")
+                            self.broadcast("[server]: It's your turn\n", whoTo=turn)
+                    
+                    elif not self.check_for_players() and len(self.players_sockets) == 1:   
+                        print("not enough players")                           
+                        self.broadcast("There are not enough players to continue. Ending game\n")
+                        game_started = False
+
                 # a message from a client, not a new connection
                 else:
                     # process data recieved from client, 
@@ -112,22 +142,33 @@ class Server:
                         data = read_sock.recv(RECV_BUFFER).decode('UTF-8')
                         # print(f"after data recv else statement: {data}")
                         if data:
-                            """
-                            if not all(Server.game_started):
-                                if data.lower() == 'ready':
-                                    if self.players_sockets[sock.getpeername()][1] == 'X' and not Server.game_started[0]:
-                                        Server.game_started[0] = True
-                                    elif self.players_sockets[sock.getpeername()][1] == 'O' and not Server.game_started[1]:
-                                        Server.game_started[1] = True
-                                # there is something in the socket
-                                # print(f"recieved data: {data}")
-                            """
-                            self.broadcast(f"\r[{str(read_sock.getpeername())}]: {data}", sock=read_sock)
+                            if game_started:
+                                """Check if the player input is valid
+                                    Check if the person replying is the person who has a turn
+                                        if not then just print their data
+                                        else sanitize the input and switch the turn
+                                """                                
+                                if data[0] == '(':
+                                    if self.players_sockets.get(read_sock.getpeername(), None)[1] == turn:
+                                        """Check if the data from the person whose turn it is a move"""
+                                        if self.sanitize_input(data, turn):
+                                            print(game_board.__str__())
+                                        else:
+                                            self.broadcast(f"\r[{str(read_sock.getpeername())}]: {data}", sock=read_sock)
+                                        # Switch turns
+                                        turn = 'O' if turn == 'X' else 'X'
+                                    else:
+                                        self.broadcast(f"\r[{str(read_sock.getpeername())}]: {data}", sock=read_sock)
+                                else:
+                                    self.broadcast(f"\r[{str(read_sock.getpeername())}]: {data}", sock=read_sock)
+
                         else:
+                            print(data)
                             # remove the socket that's broken    
                             if read_sock in self.players_sockets:
                                 # print("Sock in else: {}".format(sock))
-                                self.players_sockets.pop(read_sock.getpeername())
+                                print(f"peer name: {read_sock.getpeername()}")
+                                self.players_sockets.pop(read_sock)
 
                             # at this stage, no data means probably the connection has been broken
                             self.broadcast(f"Client {addr} is offline\n") 
@@ -138,8 +179,8 @@ class Server:
                         self.broadcast(f"Client {addr} is offline\n")
                         continue
     
-    # broadcast chat messages to all connected clients sock=NOne, whoTo=0
-    def broadcast (self, message, **kwargs):
+    # broadcast chat messages to all connected clients
+    def broadcast (self, message: str, **kwargs: Dict):
     #whoTo = 0 send to only X players (asking for move)
     #whoTO = 1 send to only O players (asking for move)
     #whoTo = 2 send to all players (position where person will play)
@@ -150,7 +191,8 @@ class Server:
         else:
             socket_sent_msg = server_name
 
-        for socket in self.players_sockets:
+        for socket in self.players_sockets.keys():
+            # print(f"player keys: {socket}")
             # send the message only to peer
             # print(f"if {socket} != {self.server_socket.getsockname()} and {socket} != {sock.getpeername()}")
             try:
@@ -159,13 +201,15 @@ class Server:
                     if socket != server_name and socket != socket_sent_msg:
                         self.players_sockets[socket][0].send(bytes(message, 'UTF-8'))
                 else:
-                    if whoTo == 1:
+                    if kwargs['whoTo'] == 'X':
+                        print("broadcast to X")
                         # Broadcast to only X players
-                        if socket != server_name and socket != socket_sent_msg and self.player_sockets[socket][1] == 'X':
+                        if socket != server_name and socket != socket_sent_msg and self.players_sockets[socket][1] == 'X':
                                 self.players_sockets[socket][0].send(bytes(message, 'UTF-8'))
                     else:
                         # Broadcast to only O players
-                        if socket != server_name and socket != socket_sent_msg and self.player_sockets[socket][1] == 'O':
+                        print("broadcast to O")
+                        if socket != server_name and socket != socket_sent_msg and self.players_sockets[socket][1] == 'O':
                                 self.players_sockets[socket][0].send(bytes(message, 'UTF-8'))
             except Exception as e:
                 print(e)
@@ -218,12 +262,14 @@ if __name__ == "__main__":
     HOST = '0.0.0.0'
     PORT = 9009
     server = Server(HOST, PORT)
+
     try:
-        print(server.game_board.__str__())
+        # print(server.game_board.__str__())
         server.chat_server()
     
     except KeyboardInterrupt:
         server.server_socket.close()
+        print("\n")
         sys.exit()
 
 """
