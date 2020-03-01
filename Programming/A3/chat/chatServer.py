@@ -2,9 +2,8 @@ import sys
 import socket
 import select
 
-HOST = 'localhost' 
-SOCKET_LIST_X = []
-SOCKET_LIST_Y = []
+HOST = '0.0.0.0' 
+SOCKET_LIST = []
 count = 0
 RECV_BUFFER = 4096 
 PORT = 9009
