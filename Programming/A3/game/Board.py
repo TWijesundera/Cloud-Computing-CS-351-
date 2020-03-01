@@ -5,6 +5,8 @@
     CS 351
     Assignment 3
 """
+import sys
+
 from typing import List
 
 class Board:
@@ -29,11 +31,14 @@ class Board:
             Returns:
                 None
         """
-        location_to_change = self._board[row-1][col-1]
-        if location_to_change == '-':
-            self._board[row-1][col-1] = symbol
+        if row >=1 and row <=9 and col >=1 and col <=9:
+            location_to_change = self._board[row-1][col-1]
+            if location_to_change == '-':
+                self._board[row-1][col-1] = symbol
+            else:
+                raise IndexError("There is already a symbol in that position\n")
         else:
-            raise IndexError("There is already a symbol in that position\n")
+            raise IndexError("Unable to access that location\n")
 
     def board_full(self) -> bool:
         """Check if the board is full"""
@@ -47,6 +52,8 @@ class Board:
            vertical and diagonal
 
             Args:
+                row (int)
+                col (int)
 
             Returns:
                 The winners symbol
@@ -54,6 +61,10 @@ class Board:
             Algorithm:
                 If all return false then check if the board is filled
                 If the board is filled then it is a draw
+
+            Notes:
+                Instead we could get the row that was just added to
+                and check the row before and after for a winner in a 3x3 area
         
         """
         print("vertical: {}".format(self.check_vertical()))
