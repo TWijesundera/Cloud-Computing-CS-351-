@@ -41,9 +41,14 @@ class Board:
             raise IndexError("Unable to access that location\n")
 
     def board_full(self) -> bool:
-        """Check if the board is full"""
+        """Check if the board is full
+
+            Returns:
+                True: The board is completely full
+                False: The board still has empty spaces
+        """
         for x in self._board.values():
-             if '-' in x:    
+            if '-' in x:    
                 return False
         return True
 
@@ -67,9 +72,18 @@ class Board:
                 and check the row before and after for a winner in a 3x3 area
         
         """
-        print("vertical: {}".format(self.check_vertical()))
-        print("horizontal: {}".format(self.check_horizontal()))
-        print("diagonal: {}".format(self.check_diagonal()))
+        vertical = self.check_vertical()
+        horizontal = self.check_horizontal()
+        diagonal = self.check_diagonal()
+
+        if vertical[0]:
+            return vertical[1]
+        elif horizontal[0]:
+            return horizontal[1]
+        elif diagonal[0]:
+            return diagonal[1]
+        else:
+            return None
 
     def check_horizontal(self) -> tuple:
         """Checks each row for 3 in a row
@@ -92,13 +106,6 @@ class Board:
             Retuns:
                 True, symbol: If 3 in a row in found
                 False, none: If 3 in a row is not found
-            
-            Algorithm:
-                Loop the dictionary keys to the length of dict - 2
-                to prevent index out of bounds error
-
-                Loop over the row and find the first non '-' character
-                Check if 
         """
         ref_board = self._board
         for key in range(len(ref_board)-2):
@@ -124,9 +131,6 @@ class Board:
                         == ref_board[key+2][index+2]:
                         return (True, ref_board[key][index])
         return (False, None)
-
-    def reset_board(self):
-        pass
 
     def __repr__(self):
         """Returns the dictionary"""
