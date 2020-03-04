@@ -1,6 +1,9 @@
 """This class handles all interations with the
     tic tac toe board
 
+    Requirements:
+        Python 3.6: There are uses of f strings in this code
+
     Author: Thisara Wijesundera
     CS 351
     Assignment 3
@@ -10,7 +13,7 @@
 """
 import sys
 
-from typing import List, Dict
+from typing import Dict
 
 class Board:
     """ Class that holds all functions for the tic tac toe board
@@ -20,8 +23,17 @@ class Board:
     """
 
     def __init__(self):
-        """Initializes an empty 9x9 board into a dict"""
-        self._board = { key: ['-'] * 9 for key in range(9) }
+        """Initializes an empty 9x9 board into a dict
+
+            Instance:
+                _board (Dict): stores the entire tic tac toe
+                    board into a 9x9 dict for quick access
+
+            Improvements:
+                Only initialize locations like (2,3) (4,6) etc
+                    to save space. Handle the empty spaces in printing
+        """
+        self._board = {key: ['-'] * 9 for key in range(9)}
 
     def update_board(self, row: int, col: int, symbol: str):
         """Updates self._board to reflect the symbol placed
@@ -34,7 +46,7 @@ class Board:
             Returns:
                 None
         """
-        if row >=1 and row <=9 and col >=1 and col <=9:
+        if 1 <= row <= 9 and 1 <= col <= 9:
             location_to_change = self._board[row-1][col-1]
             if location_to_change == '-':
                 self._board[row-1][col-1] = symbol
@@ -50,8 +62,8 @@ class Board:
                 True: The board is completely full
                 False: The board still has empty spaces
         """
-        for x in self._board.values():
-            if '-' in x:    
+        for row in self._board.values():
+            if '-' in row:
                 return False
         return True
 
@@ -62,14 +74,10 @@ class Board:
             Returns:
                 The winners symbol or None if there is no winner
 
-            Algorithm:
-                If all return false then check if the board is filled
-                If the board is filled then it is a draw
-
             Future Improvements:
                 Instead we could get the row that was just added to
                 and check the row before and after for a winner in a 3x3 area
-        
+
         """
         vertical = self.check_vertical()
         horizontal = self.check_horizontal()
@@ -77,12 +85,11 @@ class Board:
 
         if vertical[0]:
             return vertical[1]
-        elif horizontal[0]:
+        if horizontal[0]:
             return horizontal[1]
-        elif diagonal[0]:
+        if diagonal[0]:
             return diagonal[1]
-        else:
-            return None
+        return None
 
     def check_horizontal(self) -> tuple:
         """Checks each row for 3 in a row
@@ -98,7 +105,7 @@ class Board:
                     if row[index] == row[index+1] == row[index+2]:
                         return (True, row[index])
             return (False, None)
-        
+
     def check_vertical(self) -> tuple:
         """Checks for 3 in a row vertically
 
@@ -137,13 +144,13 @@ class Board:
 
     def __str__(self) -> str:
         """Prints the board in a string format
-            
+
             Return:
-                printed_board(str): String represenation of the board
+                printed_board (str): String represenation of the board
         """
         printed_board = []
         printed_board.append("ROW")
-        for row_num, row in enumerate(self._board):
+        for row_num, row in reversed(list(enumerate(self._board))):
             printed_board.append("  {}  {}".format(row_num+1, "  ".join(self._board[row_num])))
         printed_board.append("COL  {}".format("  ".join([str(x+1) for x in range(len(self._board))])))
         return "\n".join(printed_board)
@@ -151,21 +158,3 @@ class Board:
 if __name__ == "__main__":
     print("Please run using Server.py\n")
     sys.exit()
-    """
-    board = Board()
-    board.update_board(1,7,'O')
-    board.update_board(1,8,'O')
-    board.update_board(1,9,'O')
-    board.update_board(7,7,'O')
-    board.update_board(8,8,'O')
-    board.update_board(9,9,'O')
-    print(board.__str__())
-    board.find_winner()
-    #print(board.board_full())
-    board.update_board(2, 3, 'X')
-    print("\n")
-    board.__str__()
-    board.update_board(2, 3, 'X')
-    print("\n")
-    board.__str__()
-    """
