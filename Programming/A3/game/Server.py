@@ -1,3 +1,14 @@
+"""This class controls a Chat and Tic Tac Toe game server
+
+    Usage:
+        python3 Server.py
+        Server socket is bound to 0.0.0.0 on port 9009
+
+    Author: Thisara Wijesundera
+    CS 351
+    Assignment 3
+"""
+
 import sys
 import socket
 import select
@@ -7,17 +18,19 @@ from Board import Board
 from typing import Dict, List
 from collections import Counter
 
-count = 0
 RECV_BUFFER = 4096
 
 class Server:
     """Server for tic tac toe game
 
-        Variables:
-            Server.symbol (str): Keeps track of what team to assign client
+        Binds on 0.0.0.0 on port 9009
+
+        Notes:
+            Improvements could be made on number of times
+                the board object is accessed.
+            Should implement tracking the number of moves
+                and only checking if the board is full after a large number of moves
     """
-    
-    symbol = 'X'
 
     def __init__(self, HOST: str, PORT: int):
         """Initilize server with some variables
@@ -40,11 +53,12 @@ class Server:
 
             # add server socket object to the dict of readable connections
             self.players_sockets[self.server_socket.getsockname()] = (self.server_socket, 'server')
+
         except socket.error as msg:
             print(f"ERROR {msg}")
             sys.exit()
 
-    def check_for_players(self):
+    def check_for_players(self) -> bool:
         """Checks if there are enough 'X' and 'O' players to play the game
 
             Returns:
@@ -64,6 +78,9 @@ class Server:
             Returns:
                 True: Successfully able to update the board
                 False: Unable to update board
+
+            Notes:
+                There could be some un-caught edge cases here
         """
         user_in = re.findall(r"[^\W_]+", user_data)
         try:
@@ -73,10 +90,12 @@ class Server:
             return False
         
 
-    def chat_server(self):
+    def chat_server(self) -> None:
         """Starts the server loop
 
             Recieves data communication from all clients connect to the server
+            Starts a tic tac toe game if there are enough players and allows
+                them to chat with each other
 
             Algorithm:
                 Check if there are 3 player sockets and one is X and one is O 
@@ -86,6 +105,11 @@ class Server:
                     Send position to Board object
                 Else
                     Text data gets sent to everyone
+
+            Improvements:
+                Create a GUI for each user
+                Create a way for players to whisper to their teammates
+                Recognize commands so players can check which team their on again
         """
         server_socket = self.server_socket
         game_started = False
@@ -156,7 +180,7 @@ class Server:
                                         self.broadcast(f"\r[{str(read_sock.getpeername())}]: {data}", sock=read_sock)
 
                             else:
-                                # remove the socket that's broken    
+                                # remove the socket that's broken
                                 if read_sock in self.players_sockets:
                                     # print("Sock in else: {}".format(sock))
                                     # print(f"peer name: {read_sock.getpeername()}")
@@ -200,7 +224,7 @@ class Server:
                 whoTO = 'O' send to only O players (asking for move)
                 whoTo = "self" send to player who just connected (tell player what their symbol is)
         """
-    
+   
         server_name = self.server_socket.getsockname()
         if 'sock' in kwargs:
             socket_sent_msg = kwargs['sock'].getpeername()
@@ -248,7 +272,6 @@ if __name__ == "__main__":
     server = Server(HOST, PORT)
 
     try:
-        # print(server.game_board.__str__())
         server.chat_server()
         server.server_socket.close()
     

@@ -4,10 +4,13 @@
     Author: Thisara Wijesundera
     CS 351
     Assignment 3
+
+    Future Improvements:
+        Create an interactive GUI for the user
 """
 import sys
 
-from typing import List
+from typing import List, Dict
 
 class Board:
     """ Class that holds all functions for the tic tac toe board
@@ -20,7 +23,7 @@ class Board:
         """Initializes an empty 9x9 board into a dict"""
         self._board = { key: ['-'] * 9 for key in range(9) }
 
-    def update_board(self, row, col, symbol):
+    def update_board(self, row: int, col: int, symbol: str):
         """Updates self._board to reflect the symbol placed
 
             Args:
@@ -56,18 +59,14 @@ class Board:
         """Checks if there is 3 in a row on the horizontal
            vertical and diagonal
 
-            Args:
-                row (int)
-                col (int)
-
             Returns:
-                The winners symbol
+                The winners symbol or None if there is no winner
 
             Algorithm:
                 If all return false then check if the board is filled
                 If the board is filled then it is a draw
 
-            Notes:
+            Future Improvements:
                 Instead we could get the row that was just added to
                 and check the row before and after for a winner in a 3x3 area
         
@@ -132,7 +131,7 @@ class Board:
                         return (True, ref_board[key][index])
         return (False, None)
 
-    def __repr__(self):
+    def __repr__(self) -> Dict:
         """Returns the dictionary"""
         return self._board
 
