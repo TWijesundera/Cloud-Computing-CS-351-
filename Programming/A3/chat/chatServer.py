@@ -16,7 +16,7 @@ def chat_server():
     server_socket.listen(10)
  
     # add server socket object to the list of readable connections
-    SOCKET_LIST_X.append(server_socket)
+    SOCKET_LIST.append(server_socket)
  
     print ("Chat server started on port " + str(PORT))
  
@@ -24,13 +24,13 @@ def chat_server():
 
         # get the list sockets which are ready to be read through select
         # 4th arg, time_out  = 0 : poll and never block
-        ready_to_read,ready_to_write,in_error = select.select(SOCKET_LIST_X,[],[],0)
+        ready_to_read, ready_to_write, in_error = select.select(SOCKET_LIST, [], [], 0)
       
         for sock in ready_to_read:
             # a new connection request recieved
             if sock == server_socket: 
                 sockfd, addr = server_socket.accept()
-                SOCKET_LIST_X.append(sockfd)
+                SOCKET_LIST.append(sockfd)
                 print ("Client (%s, %s) connected" % addr)
                  
                 broadcast(server_socket, sockfd, "[%s:%s] entered our chatting room\n" % addr)
@@ -46,8 +46,8 @@ def chat_server():
                         broadcast(server_socket, sock, f"\r[ {str(sock.getpeername())} ] {data}")  
                     else:
                         # remove the socket that's broken    
-                        if sock in SOCKET_LIST_X:
-                            SOCKET_LIST_X.remove(sock)
+                        if sock in SOCKET_LIST:
+                            SOCKET_LIST.remove(sock)
 
                         # at this stage, no data means probably the connection has been broken
                         broadcast(server_socket, sock, "Client (%s, %s) is offline\n" % addr) 
@@ -64,7 +64,7 @@ def broadcast (server_socket, sock, message):
 #whoTo = 0 send only x players
 #whoTO = 1 send to only Y
 #whoTo = 2 send to all
-    for socket in SOCKET_LIST_X:
+    for socket in SOCKET_LIST:
         # send the message only to peer
         if socket != server_socket and socket != sock :
             try :
