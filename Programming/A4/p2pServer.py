@@ -26,8 +26,8 @@ class Server:
         self._connected_users[self._server_socket.getsockname()] = self._server_socket
 
     def start_server(self):
-        address_second_connect = ""
-        port_second_connect = 9009
+        second_address = ""
+        second_port = 9009
         server_socket = self._server_socket
 
         while True:
@@ -41,7 +41,7 @@ class Server:
                     
                     if len(self._connected_users) > 2:
                         # Send the address the new user should connect to
-                        new_conn.send(addr[0])
+                        new_conn.send(bytes(f"{second_address} {second_port}", 'UTF-8'))
                     else:
                         msg = "serverPeer"
                         new_conn.send(bytes(msg, 'UTF-8'))
@@ -49,8 +49,9 @@ class Server:
                     try:
                         data = read_sock.recv(4096).decode('UTF-8')
                         if data:
-                            port_second_connect = data if data.isdigit() else 9000
-                            print(f"The next peer will connect to {addr} on port {port_second_connect}")
+                            second_port = data if data.isdigit() else 9009
+                            second_address = addr[0]
+                            print(f"The next peer will connect to {second_address} on port {second_port}")
                         else:
                             print(f"Client {addr} is offline\n")
                             # Person left the server
