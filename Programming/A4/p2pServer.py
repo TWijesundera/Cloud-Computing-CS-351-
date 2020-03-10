@@ -15,6 +15,15 @@ import select
 class Server:
 
     def __init__(self, HOST: str, PORT: int):
+        """Creates the Server object
+
+            Binds a socket instance to 0.0.0.0 on port 9009
+
+            Instance Variables:
+                _connected_user (Dict): Dictionary of users that have connected
+                    to the server
+                _server_socket (Socket Object): Servers socket object
+        """
         self._connected_users = {}
 
         self._server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -26,6 +35,15 @@ class Server:
         self._connected_users[self._server_socket.getsockname()] = self._server_socket
 
     def start_server(self):
+        """Starts the torrent server
+
+            Users connect to the torrent server
+            The torrent server tells the client who to connect to directly
+
+            Variables:
+                second_address (str): The address the second client should connect to
+                second_port (int): The port the second client should connect to
+        """
         second_address = ""
         second_port = 9009
         server_socket = self._server_socket
@@ -62,6 +80,11 @@ class Server:
                         print(msg)
                         # Tell the first user they should open a connection
 if __name__ == "__main__":
+    """Main method
+
+        Create a server object and begin allowing
+            users to connect
+    """
     try:
         server = Server("0.0.0.0", 9009)
         server.start_server()
