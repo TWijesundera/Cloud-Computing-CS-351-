@@ -98,11 +98,17 @@ class Client:
 
                 Else
                     Connect to the ip address over the port provided and exchange information
+
+            Variables:
+                peer_flag (bool): Flag to tell if a the program was told to become a server
+                cient_flag (bool): Flag to tell if the program was told to connect to a p2pServer
+                direct_conn_info (List): Info of the server to connect to
         """
 
         peer_flag = False
         client_flag = False
         direct_conn_info = []
+
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.settimeout(2)
         socket_list = [sys.stdin, client_socket]

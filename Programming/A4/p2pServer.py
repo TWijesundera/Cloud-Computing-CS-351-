@@ -30,7 +30,7 @@ class Server:
         self._server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._server_socket.bind((HOST, PORT))
         self._server_socket.listen(10)
-        print(f"Chat server started on port {str(PORT)}\n")
+        print(f"Chat server started on port {PORT}\n")
         
         self._connected_users[self._server_socket.getsockname()] = self._server_socket
 
@@ -43,6 +43,7 @@ class Server:
             Variables:
                 second_address (str): The address the second client should connect to
                 second_port (int): The port the second client should connect to
+                new_conn (Socket Object): 
         """
         second_address = ""
         second_port = 9009
