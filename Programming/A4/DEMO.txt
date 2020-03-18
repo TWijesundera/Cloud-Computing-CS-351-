@@ -1,0 +1,62 @@
+Server:
+	Chat server started on port 9009
+
+	Client ('3.15.9.94', 54558) connected
+
+	The next peer will connect to 3.15.9.94 on port 9040
+	Client ('3.134.110.121', 42232) connected
+
+	Client ('3.134.110.121', 42232) is offline
+
+	Client ('3.134.110.121', 42232) is offline
+
+
+Client1:
+	[ec2-user@ip-172-31-40-147 ~]$ python3 p2pClient.py 18.219.56.98 9009 https://www.gutenberg.org/files/61168/61168-0.txt                                         --2020-03-18 16:03:00--  https://www.gutenberg.org/files/61168/61168-0.txt
+	Resolving www.gutenberg.org (www.gutenberg.org)... 152.19.134.47, 2610:28:3090:3
+	000:0:bad:cafe:47
+	Connecting to www.gutenberg.org (www.gutenberg.org)|152.19.134.47|:443... connec
+	ted.
+	HTTP request sent, awaiting response... 200 OK
+	Length: 455862 (445K) [text/plain]
+	Saving to: ‘book.txt’
+
+	book.txt            100%[===================>] 445.18K  1.63MB/s    in 0.3s    
+
+	2020-03-18 16:03:00 (1.63 MB/s) - ‘book.txt’ saved [455862/455862]
+
+	Started to listen on port 9040
+
+	Got a connection from ('3.134.110.121', 56488)
+
+	These words are common between the two books:
+	{'looked', 'found', 'being', 'think', 'their', 'should', 'young', 'never', 'afte
+	r', 'might', 'There', 'before', 'rather', 'quite', 'could', 'nothing', 'heard', 
+	'other', 'there', 'would', 'woman', 'turned', 'thing', 'where', 'asked', 'which'
+	, 'shall', 'though', 'little', 'about', 'through', 'without', 'Project', 'seemed
+	'}
+
+Client2:
+	[ec2-user@ip-172-31-38-57 ~]$ python3 p2pClient.py 18.219.56.98 9009 http[0/114]
+	.gutenberg.org/files/58866/58866-0.txt
+	--2020-03-18 16:03:08--  https://www.gutenberg.org/files/58866/58866-0.txt
+	Resolving www.gutenberg.org (www.gutenberg.org)... 152.19.134.47, 2610:28:3090:3
+	000:0:bad:cafe:47
+	Connecting to www.gutenberg.org (www.gutenberg.org)|152.19.134.47|:443... connec
+	ted.
+	HTTP request sent, awaiting response... 200 OK
+	Length: 404958 (395K) [text/plain]
+	Saving to: ‘book.txt’
+	
+	book.txt            100%[===================>] 395.47K  1.40MB/s    in 0.3s    
+
+	2020-03-18 16:03:08 (1.40 MB/s) - ‘book.txt’ saved [404958/404958]
+
+
+	These words are common between the two books:
+	{'There', 'before', 'though', 'rather', 'thing', 'seemed', 'could', 'their', 'th
+	ere', 'woman', 'Project', 'little', 'never', 'heard', 'think', 'about', 'other',
+	 'through', 'without', 'nothing', 'where', 'quite', 'which', 'asked', 'should', 
+	'young', 'turned', 'shall', 'looked', 'found', 'might', 'being', 'after', 'would
+	'}
+
